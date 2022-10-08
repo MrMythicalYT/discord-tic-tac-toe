@@ -5,6 +5,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { Board } from "../../util/board";
+import { FORFEIT_BUTTON } from "../../util/constants";
 import { CommandHandler } from "../handler";
 
 export default new CommandHandler()
@@ -35,6 +36,9 @@ export default new CommandHandler()
           })
       )
     ).map((c) => new ActionRowBuilder<ButtonBuilder>().setComponents(c));
+    components.push(
+      FORFEIT_BUTTON
+    )
     interaction.reply({
       content: `${interaction.options.getUser("user")}\n${new Board()}`,
       components,

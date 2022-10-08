@@ -5,7 +5,7 @@ import {
   userMention,
 } from "discord.js";
 import parseBoard, { type Side } from "../../util/board";
-import { BLUE_CIRCLE, EMPTY_CIRCLE, RED_CIRCLE } from "../../util/constants";
+import { EMOJI_O, EMOJI_EMPTY, FORFEIT_BUTTON, EMOJI_X } from "../../util/constants";
 import parseCustomId from "../../util/parseCustomId";
 import { ComponentHandler } from "../handler";
 
@@ -46,12 +46,12 @@ export default new ComponentHandler()
               "." +
               newSide
           )
-          .setEmoji(board.circles[i1][i2] === "blue" ? BLUE_CIRCLE : board.circles[i1][i2] === "red" ? RED_CIRCLE : EMPTY_CIRCLE)
+          .setEmoji(board.circles[i1][i2] === "blue" ? EMOJI_O : board.circles[i1][i2] === "red" ? EMOJI_X : EMOJI_EMPTY)
         )
       )
     );
     return void interaction.update({
-      components: editedRows,
+      components: (editedRows.push(FORFEIT_BUTTON), editedRows),
       content: `${userMention(nextUser)}\n${board}`,
     });
   });

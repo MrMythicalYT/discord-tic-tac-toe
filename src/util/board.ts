@@ -1,4 +1,4 @@
-import { BLUE_CIRCLE, EMPTY_CIRCLE, RED_CIRCLE } from "./constants";
+import { EMOJI_O, EMOJI_EMPTY, EMOJI_X } from "./constants";
 
 export default function parseBoard(content: string) {
   const parsedContent: Side[][] = content
@@ -6,7 +6,7 @@ export default function parseBoard(content: string) {
     .map((c) => c.split(""))
     .map((c) =>
       c.map((e) =>
-        e === RED_CIRCLE ? "red" : e === BLUE_CIRCLE ? "blue" : null
+        e === EMOJI_X ? "red" : e === EMOJI_O ? "blue" : null
       )
     );
   return new Board(parsedContent);
@@ -37,7 +37,7 @@ export class Board {
       .map((c) =>
         c
           .map((e) =>
-            e === "red" ? RED_CIRCLE : e === "blue" ? BLUE_CIRCLE : EMPTY_CIRCLE
+            e === "red" ? EMOJI_X : e === "blue" ? EMOJI_O : EMOJI_EMPTY
           )
           .join("")
       )
