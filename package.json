@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "start": "node dist/index",
+    "build-deploy": "tsc && npm run deploy",
+    "deploy": "node dist/deploy-commands",
+    "build-start": "tsc && npm run start",
+    "build-complete": "tsc && npm run start && npm run deploy"
+  },
+  "dependencies": {
+    "discord.js": "^14.5.0",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}
