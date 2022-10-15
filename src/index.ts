@@ -50,7 +50,7 @@ client.on(Events.ClientReady, () => {
   }
 });
 
-client.on(Events.InteractionCreate, (interaction) => {
+client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.inGuild() || interaction.isAutocomplete()) return;
   if (!interaction.isCommand() && !interaction.isButton()) return;
   const key = interaction.isCommand()
@@ -58,18 +58,22 @@ client.on(Events.InteractionCreate, (interaction) => {
     : interaction.isButton()
     ? parseCustomId(interaction.customId).main
     : null;
-  key
-    ? handlers
-        .get(key)
-        ?.execute(
-          interaction as
-            | CommandInteraction<"raw">
-            | MessageComponentInteraction<"raw">
-        )
-    : interaction.reply({
-        content: "Error: no handler found. Please contact developer",
-        ephemeral: true,
-      });
+  try {
+    key
+      ? await handlers
+          .get(key)
+          ?.execute(
+            interaction as
+              | CommandInteraction<"raw">
+              | MessageComponentInteraction<"raw">
+          )
+      : await interaction.reply({
+          content: "Error: no handler found. Please contact developer",
+          ephemeral: true,
+        });
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 client.login();
