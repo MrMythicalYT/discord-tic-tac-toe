@@ -21,26 +21,33 @@ export default new CommandHandler()
       )
   )
   .setExecute((interaction) => {
+    const target = interaction.options.getUser("user", true);
+    if (target.bot)
+      return void interaction.reply({
+        content: "You cannot play against a bot.",
+        ephemeral: true,
+      });
+    if (interaction.user.id === target.id)
+      return void interaction.reply({
+        content: "You cannot play against yourself.",
+        ephemeral: true,
+      });
     const components = Array.from({ length: 3 }, (_, i) =>
       Array.from(
         { length: 3 },
         (_, j) =>
           new ButtonBuilder({
-            // format: place.x-y.id1.id2.side
-            customId: `place.${j}-${i}.${interaction.user.id}.${
-              interaction.options.get("user", true).value
-            }.red`,
+            // format: place.x-y.currentId.nextId.side
+            customId: `place.${j}-${i}.${target.id}.${interaction.user.id}.red`,
             style: ButtonStyle.Success,
             label: "Place",
             emoji: "⚫",
           })
       )
     ).map((c) => new ActionRowBuilder<ButtonBuilder>().setComponents(c));
-    components.push(
-      FORFEIT_BUTTON
-    )
+    components.push(FORFEIT_BUTTON);
     interaction.reply({
-      content: `${interaction.options.getUser("user")}\n${new Board()}`,
+      content: `${target}\n${new Board()}`,
       components,
     });
   })

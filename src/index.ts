@@ -14,7 +14,7 @@ import { type ExecuteFunction } from "./handlers/handler";
 import parseCustomId from "./util/parseCustomId";
 const client = new Client({
   intents: [],
-  partials: [Partials.Message]
+  partials: [Partials.Message],
 });
 const handlers = new Collection<string, Handler>();
 

@@ -5,14 +5,12 @@ export default function parseBoard(content: string) {
     .split("\n")
     .map((c) => c.split(""))
     .map((c) =>
-      c.map((e) =>
-        e === EMOJI_X ? "red" : e === EMOJI_O ? "blue" : null
-      )
+      c.map((e) => (e === EMOJI_X ? "X" : e === EMOJI_O ? "O" : null))
     );
   return new Board(parsedContent);
 }
 
-export type Side = "red" | "blue" | null;
+export type Side = "X" | "O" | null;
 
 export class Board {
   circles: Side[][];
@@ -26,9 +24,9 @@ export class Board {
       boardData ?? Array.from({ length: 3 }, () => Array(3).fill(null));
   }
   placeSpot(side: Side, place: [x: number, y: number]) {
-    let set =
-    this.circles[place[0]].splice(place[1], 0, side)
-    if (set.length)
+    let current = this.circles[place[0]][place[1]];
+    this.circles[place[0]][place[1]] = side;
+    if (current)
       throw new Error(`This spot was already set: (${place[0]}, ${place[1]})`);
     return this;
   }
@@ -36,11 +34,25 @@ export class Board {
     return this.circles
       .map((c) =>
         c
-          .map((e) =>
-            e === "red" ? EMOJI_X : e === "blue" ? EMOJI_O : EMOJI_EMPTY
-          )
+          .map((e) => (e === "X" ? EMOJI_X : e === "O" ? EMOJI_O : EMOJI_EMPTY))
           .join("")
       )
       .join("\n");
+  }
+  winner(): Side | null {
+    const check1 = this.circles.find((c, i, a) =>
+      c.some((s) => a[i].every((x) => x && x === s))
+    )?.[0];
+    const check2 = this.circles.find((c, i, a) =>
+      c.some((s) => a.every((x) => x[i] && x[i] === s))
+    )?.[0];
+    const middle = this.circles[1][1];
+    const check3 =
+      (middle &&
+        [this.circles[0][0], this.circles[2][2]].every((x) => x === middle)) ||
+      [this.circles[2][0], this.circles[0][2]].every((x) => x === middle)
+        ? middle
+        : null;
+    return check1 || check2 || check3 || null;
   }
 }

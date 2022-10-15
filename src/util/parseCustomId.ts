@@ -3,7 +3,7 @@ type ReturnKeysOptions = {
 };
 
 type ReturnKeys<K extends ReturnKeysOptions, T> = {
-  [x in keyof K]: K[x] extends true ? T : T | null;
+  [x in keyof K]: K[x] extends true ? T : T | undefined;
 };
 
 export default function parseCustomId<R extends ReturnKeysOptions>(

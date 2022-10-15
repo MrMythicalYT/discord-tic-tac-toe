@@ -5,7 +5,8 @@ import {
   userMention,
 } from "discord.js";
 import parseBoard, { type Side } from "../../util/board";
-import { EMOJI_O, EMOJI_EMPTY, FORFEIT_BUTTON, EMOJI_X } from "../../util/constants";
+import { EMOJI_O, EMOJI_EMPTY, EMOJI_X } from "../../util/constants";
+import disableComponents from "../../util/disableButtons";
 import parseCustomId from "../../util/parseCustomId";
 import { ComponentHandler } from "../handler";
 
@@ -26,32 +27,55 @@ export default new ComponentHandler()
         ephemeral: true,
       });
     }
-    const board = parseBoard(interaction.message.content.split("\n").slice(1).join("\n"));
+    const board = parseBoard(
+      interaction.message.content.split("\n").slice(1).join("\n")
+    );
+    console.log(board.toString());
     board.placeSpot(
       side as Side,
       location.split("-").map(Number).reverse() as [number, number]
     );
-    const newSide: Exclude<Side, null> = side === "red" ? "blue" : "red";
+    console.log(board.toString());
+    const newSide: Exclude<Side, null> = side === "O" ? "X" : "O";
     const rows = interaction.message.components.map((c) =>
       ActionRowBuilder.from(c)
     ) as ActionRowBuilder<ButtonBuilder>[];
     const editedRows = rows.map((row, i1) =>
-      row.setComponents(
-        row.components.map((c, i2) =>
-          c.setCustomId(
-            (c.data as APIButtonComponentWithCustomId).custom_id.slice(0, 10) +
-              nextUser +
-              "." +
-              currentUser +
-              "." +
-              newSide
+      i1 < 3
+        ? row.setComponents(
+            row.components.map((c, i2) =>
+              c
+                .setCustomId(
+                  (c.data as APIButtonComponentWithCustomId).custom_id.slice(
+                    0,
+                    10
+                  ) +
+                    nextUser +
+                    "." +
+                    currentUser +
+                    "." +
+                    newSide
+                )
+                .setEmoji(
+                  board.circles[i1][i2] === "O"
+                    ? EMOJI_O
+                    : board.circles[i1][i2] === "X"
+                    ? EMOJI_X
+                    : EMOJI_EMPTY
+                )
+            )
           )
-          .setEmoji(board.circles[i1][i2] === "blue" ? EMOJI_O : board.circles[i1][i2] === "red" ? EMOJI_X : EMOJI_EMPTY)
-        )
-      )
+        : row
     );
+    const winner = board.winner();
+    if (winner) {
+      return void interaction.update({
+        content: `${interaction.user} wins by 3 in a row!\n${board}`,
+        components: editedRows.map(disableComponents),
+      });
+    }
     return void interaction.update({
-      components: (editedRows.push(FORFEIT_BUTTON), editedRows),
+      components: editedRows,
       content: `${userMention(nextUser)}\n${board}`,
     });
   });
